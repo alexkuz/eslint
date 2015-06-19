@@ -22,14 +22,14 @@ describe("FileFinder", function() {
         fileFinderDir = path.join(fixtureDir, "file-finder"),
         subsubsubdir = path.join(fileFinderDir, "subdir", "subsubdir", "subsubsubdir"),
         absentFileName = "4ktrgrtUTYjkopoohFe54676hnjyumlimn6r787",
-        uniqueFileName = "xvgRHtyH56756764535jkJ6jthty65tyhteHTEY";
+        uniqueFileName = "xvgRHtyH56756764535jkJ6jthty65tyhteHTEY",
+        cwd = process.cwd();
 
     describe("findInDirectoryOrParents", function() {
 
         describe("a searched for file that is present", function() {
             var actual,
                 finder,
-                cwd = process.cwd(),
                 expected = path.join(fileFinderDir, ".eslintignore");
 
             it("should be found when in the cwd", function() {
@@ -84,6 +84,22 @@ describe("FileFinder", function() {
                 var expected = String(),
                     finder = new FileFinder(absentFileName),
                     actual = finder.findInDirectoryOrParents();
+
+                assert.equal(actual, expected);
+            });
+        });
+
+        describe("Not consider directory with expected file names", function() {
+
+            afterEach(function() {
+                process.chdir(cwd);
+            });
+
+            it("should not be found, and an empty array returned", function() {
+                var expected = path.join(process.cwd(), "package.json");
+                process.chdir(fileFinderDir);
+                var finder = new FileFinder("package.json");
+                var actual = finder.findInDirectoryOrParents();
 
                 assert.equal(actual, expected);
             });
@@ -156,6 +172,22 @@ describe("FileFinder", function() {
 
                 assert.isArray(actual);
                 assert.lengthOf(actual, 0);
+            });
+        });
+
+        describe("Not consider directory with expected file names", function() {
+
+            afterEach(function() {
+                process.chdir(cwd);
+            });
+
+            it("should not be found, and an empty array returned", function() {
+                expected = path.join(process.cwd(), "package.json");
+                process.chdir(fileFinderDir);
+                finder = new FileFinder("package.json");
+                actual = finder.findAllInDirectoryAndParents();
+
+                assert.equal(actual, expected);
             });
         });
     });
